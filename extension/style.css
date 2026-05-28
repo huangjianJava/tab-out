@@ -299,40 +299,37 @@ header {
 }
 
 .mission-card {
-  background: var(--card-bg);
-  border: 1px solid var(--warm-gray);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px 18px;
+  padding: 14px 14px 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  break-inside: avoid;       /* don't split a card across columns */
-  margin-bottom: 12px;       /* vertical spacing (replaces grid gap) */
+  break-inside: avoid;
+  margin-bottom: 12px;
 }
 
-/* Colored top border instead of side bar for grid cards */
 .mission-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--warm-gray);
+  content: none;
 }
 
-.mission-card.has-active-bar::before { background: var(--status-active); }
-.mission-card.has-amber-bar::before { background: var(--accent-amber); }
-.mission-card.has-slate-bar::before { background: var(--accent-slate); }
-.mission-card.has-neutral-bar::before { background: var(--warm-gray); }
+.mission-card.has-active-bar::before,
+.mission-card.has-amber-bar::before,
+.mission-card.has-slate-bar::before,
+.mission-card.has-neutral-bar::before {
+  content: none;
+}
 
 .mission-card:hover {
-  box-shadow: 0 4px 20px var(--shadow);
-  transform: translateY(-1px);
+  background: var(--surface-subtle);
+  border-color: var(--border-strong);
+  box-shadow: 0 6px 18px var(--shadow);
+  transform: none;
 }
 
 /* Closing animation — card scales down and fades out */
@@ -364,8 +361,8 @@ header {
 .mission-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 
@@ -377,39 +374,39 @@ header {
 }
 
 .priority-badge {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
   padding: 3px 7px;
-  border-radius: 999px;
+  border-radius: 4px;
 }
 
 .priority-badge-duplicate {
   color: var(--accent-amber);
-  background: rgba(200, 113, 58, 0.08);
+  background: var(--accent-amber-bg);
 }
 
 .priority-badge-homepage {
-  color: var(--accent-sage);
-  background: rgba(90, 122, 98, 0.08);
+  color: var(--accent-blue);
+  background: var(--accent-blue-bg);
 }
 
 .priority-badge-large {
-  color: var(--accent-slate);
-  background: rgba(90, 107, 122, 0.08);
+  color: var(--accent-green);
+  background: var(--accent-green-bg);
 }
 
 .priority-badge-neutral {
   color: var(--muted);
-  background: rgba(154, 145, 138, 0.12);
+  background: var(--accent-gray-bg);
 }
 
 .mission-name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--ink);
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
 }
 
 .mission-tag {
@@ -441,17 +438,17 @@ header {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
-  color: var(--accent-amber);
-  background: rgba(200, 113, 58, 0.08);
-  padding: 2px 8px;
-  border-radius: 3px;
+  color: var(--muted);
+  background: var(--accent-gray-bg);
+  padding: 3px 7px;
+  border-radius: 4px;
 }
 
 .open-tabs-badge svg {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
 }
 
 .mission-summary {
