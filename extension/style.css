@@ -469,10 +469,10 @@ header {
   font-size: 13px;
   color: var(--ink);
   background: transparent;
-  padding: 8px 4px;
-  border-radius: 0;
+  padding: 7px 6px;
+  border-radius: 5px;
   border: none;
-  border-bottom: 1px solid rgba(154, 145, 138, 0.1);
+  border-bottom: 1px solid rgba(55, 53, 47, 0.08);
   position: relative;
   display: flex;
   align-items: center;
@@ -490,7 +490,7 @@ header {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 /* Title text — wraps naturally, no truncation */
@@ -512,7 +512,7 @@ header {
 
 /* Duplicate border highlight */
 .chip-has-dupes {
-  border-color: rgba(200, 113, 58, 0.25);
+  background: rgba(159, 107, 50, 0.05);
 }
 
 /* Action buttons grouped on the right */
@@ -529,13 +529,13 @@ header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: none;
+  background: transparent;
   border: none;
   color: var(--muted);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  opacity: 0.35;
+  opacity: 0.32;
   transition: opacity 0.15s, color 0.15s, background 0.15s;
   flex-shrink: 0;
 }
@@ -547,17 +547,17 @@ header {
 
 .chip-action:hover {
   opacity: 1;
-  background: rgba(154, 145, 138, 0.1);
+  background: var(--surface-hover);
 }
 
 .chip-save:hover {
-  color: var(--accent-sage);
-  background: rgba(90, 122, 98, 0.08);
+  color: var(--accent-blue);
+  background: var(--accent-blue-bg);
 }
 
 .chip-close:hover {
-  color: var(--status-abandoned);
-  background: rgba(179, 90, 90, 0.08);
+  color: var(--accent-red);
+  background: var(--accent-red-bg);
 }
 
 .page-chip.clickable {
@@ -566,7 +566,7 @@ header {
 }
 
 .page-chip.clickable:hover {
-  background: rgba(200, 113, 58, 0.04);
+  background: var(--surface-hover);
 }
 
 /* "+N more" overflow chip */
@@ -586,7 +586,7 @@ header {
 
 .mission-page-count {
   font-size: 20px;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-sans);
   font-weight: 300;
   color: var(--ink);
   line-height: 1;
@@ -602,28 +602,30 @@ header {
 /* ---- Actions row ---- */
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
 }
 
 .action-btn {
-  font-size: 11px;
-  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-family: var(--font-sans);
   font-weight: 500;
-  padding: 5px 14px;
-  border-radius: 4px;
-  border: 1px solid var(--warm-gray);
-  background: var(--card-bg);
-  color: var(--muted);
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--ink-soft);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   display: inline-flex;
   align-items: center;
   gap: 5px;
 }
 
 .action-btn:hover {
-  border-color: var(--ink);
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
   color: var(--ink);
 }
 
@@ -634,23 +636,19 @@ header {
 
 .action-btn.primary {
   background: var(--ink);
-  color: var(--paper);
+  color: #ffffff;
   border-color: var(--ink);
 }
 
-.action-btn.primary:hover {
-  opacity: 0.85;
-}
-
 .action-btn.close-tabs {
-  border-color: rgba(200, 113, 58, 0.3);
-  color: var(--accent-amber);
-  background: rgba(200, 113, 58, 0.04);
+  border-color: rgba(164, 81, 81, 0.18);
+  color: var(--accent-red);
+  background: var(--accent-red-bg);
 }
 
 .action-btn.close-tabs:hover {
-  background: rgba(200, 113, 58, 0.1);
-  border-color: var(--accent-amber);
+  background: #f4e5e5;
+  border-color: rgba(164, 81, 81, 0.30);
 }
 
 .action-btn.close-tabs-secondary {
@@ -659,14 +657,14 @@ header {
 }
 
 .action-btn.save-tabs {
-  border-color: rgba(90, 122, 98, 0.3);
-  color: var(--accent-sage);
-  background: rgba(90, 122, 98, 0.04);
+  border-color: rgba(63, 111, 159, 0.18);
+  color: var(--accent-blue);
+  background: var(--accent-blue-bg);
 }
 
 .action-btn.save-tabs:hover {
-  background: rgba(90, 122, 98, 0.1);
-  border-color: var(--accent-sage);
+  background: #e5eef8;
+  border-color: rgba(63, 111, 159, 0.30);
 }
 
 .action-btn.danger {
@@ -714,9 +712,9 @@ header {
 
 /* ---- Footer ---- */
 footer {
-  margin-top: 48px;
-  padding-top: 20px;
-  border-top: 1px solid var(--warm-gray);
+  margin-top: 44px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -732,18 +730,18 @@ footer {
 }
 
 .stat-num {
-  font-family: 'Newsreader', serif;
-  font-size: 28px;
-  font-weight: 300;
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 600;
   color: var(--ink);
   line-height: 1;
   transition: all 0.3s;
 }
 
 .stat-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--muted);
   margin-top: 4px;
 }
@@ -754,7 +752,7 @@ footer {
 }
 
 .refresh-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 500;
   color: var(--accent-amber);
@@ -832,29 +830,23 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
 
 /* CSS-drawn checkmark in a glowing circle */
 .empty-checkmark {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: rgba(90, 122, 98, 0.1);
-  border: 1.5px solid rgba(90, 122, 98, 0.3);
-
-  /* Soft sage glow */
-  box-shadow: 0 0 0 8px rgba(90, 122, 98, 0.05),
-              0 0 0 16px rgba(90, 122, 98, 0.03);
-
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: var(--accent-green-bg);
+  border: 1px solid rgba(79, 125, 100, 0.22);
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Pop in with a gentle scale animation */
   animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 }
 
 .empty-checkmark svg {
-  width: 26px;
-  height: 26px;
-  color: var(--accent-sage);
-  stroke-width: 2.5;
+  width: 25px;
+  height: 25px;
+  color: var(--accent-green);
+  stroke-width: 2.4;
 }
 
 @keyframes checkPop {
@@ -863,19 +855,19 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
 }
 
 .empty-title {
-  font-family: 'Newsreader', serif;
-  font-size: 20px;
-  font-weight: 400;
-  font-style: italic;
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  font-style: normal;
   color: var(--ink);
-  letter-spacing: -0.3px;
+  letter-spacing: 0;
 }
 
 .empty-subtitle {
   font-size: 13px;
   color: var(--muted);
   font-weight: 400;
-  letter-spacing: 0.3px;
+  letter-spacing: 0;
 }
 
 
