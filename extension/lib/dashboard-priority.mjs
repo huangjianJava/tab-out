@@ -53,7 +53,7 @@ export function buildPriorityReasons(group = {}, largestTabCount = 0) {
 
   if (tabCount >= 8 && tabCount === largestTabCount) {
     reasons.push(`Largest group: ${tabCount} tabs`);
-  } else if (reasons.length === 0 || duplicateExtraCount > 0 || isHomepageGroup) {
+  } else if (reasons.length === 0) {
     reasons.push(`${tabCount} tab${tabCount === 1 ? '' : 's'} open`);
   }
 

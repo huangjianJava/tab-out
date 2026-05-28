@@ -8,7 +8,7 @@ import {
   formatCleanupToast,
 } from '../lib/dashboard-priority.mjs';
 
-test('annotateGroupsWithPriority sorts groups by cleanup score and explains why', () => {
+test('annotateGroupsWithPriority sorts groups by cleanup score and applies strict reason precedence', () => {
   const groups = [
     {
       domain: 'github.com',
@@ -48,7 +48,7 @@ test('annotateGroupsWithPriority sorts groups by cleanup score and explains why'
   assert.equal(annotated[0].tabCount, 3);
   assert.equal(annotated[0].duplicateExtraCount, 1);
   assert.equal(annotated[0].cleanupScore, 26);
-  assert.deepEqual(annotated[0].priorityReasons, ['1 duplicate tab', '3 tabs open']);
+  assert.deepEqual(annotated[0].priorityReasons, ['1 duplicate tab']);
   assert.equal(annotated[0].priorityTone, 'duplicate');
 
   assert.equal(annotated[1].label, 'Docs Example');
@@ -58,12 +58,49 @@ test('annotateGroupsWithPriority sorts groups by cleanup score and explains why'
 
   assert.equal(annotated[2].label, 'Homepages');
   assert.equal(annotated[2].cleanupScore, 16);
-  assert.deepEqual(annotated[2].priorityReasons, ['Homepage cleanup', '2 tabs open']);
+  assert.deepEqual(annotated[2].priorityReasons, ['Homepage cleanup']);
   assert.equal(annotated[2].priorityTone, 'homepage');
 
   assert.equal(annotated[3].label, 'Local Files');
   assert.deepEqual(annotated[3].priorityReasons, ['1 tab open']);
   assert.equal(annotated[3].priorityTone, 'neutral');
+});
+
+test('annotateGroupsWithPriority only falls back to tab count when no higher-priority reason applies', () => {
+  const groups = [
+    {
+      domain: 'github.com',
+      tabs: [
+        { url: 'https://github.com/openai/openai' },
+        { url: 'https://github.com/openai/openai' },
+      ],
+    },
+    {
+      domain: HOMEPAGE_DOMAIN,
+      tabs: [
+        { url: 'https://mail.google.com/mail/u/0/#inbox' },
+        { url: 'https://github.com/' },
+      ],
+    },
+    {
+      domain: 'docs.example.com',
+      tabs: Array.from({ length: 8 }, (_, index) => ({
+        url: `https://docs.example.com/page-${index + 1}`,
+      })),
+    },
+    {
+      domain: 'local-files',
+      tabs: [{ url: 'file:///Users/demo/notes.txt' }],
+    },
+  ];
+
+  const annotated = annotateGroupsWithPriority(groups);
+  const byDomain = Object.fromEntries(annotated.map(group => [group.domain, group]));
+
+  assert.deepEqual(byDomain['github.com'].priorityReasons, ['1 duplicate tab']);
+  assert.deepEqual(byDomain[HOMEPAGE_DOMAIN].priorityReasons, ['Homepage cleanup']);
+  assert.deepEqual(byDomain['docs.example.com'].priorityReasons, ['Largest group: 8 tabs']);
+  assert.deepEqual(byDomain['local-files'].priorityReasons, ['1 tab open']);
 });
 
 test('buildHealthSummary returns totals and biggest group details', () => {
