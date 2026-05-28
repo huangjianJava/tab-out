@@ -22,6 +22,7 @@ export function friendlyGroupLabel(group = {}) {
   const domain = group?.domain || '';
 
   if (domain === HOMEPAGE_DOMAIN) return 'Homepages';
+  if (group?.label) return group.label;
   if (KNOWN_LABELS[domain]) return KNOWN_LABELS[domain];
 
   const clean = domain
@@ -86,10 +87,12 @@ export function annotateGroupsWithPriority(groups = []) {
 
       const annotated = {
         ...group,
-        label: friendlyGroupLabel(group),
+        displayLabel: friendlyGroupLabel(group),
         tabCount,
         duplicateExtraCount,
         isHomepageGroup,
+        isLocalhost: group?.domain === 'localhost',
+        urlCounts,
         cleanupScore,
       };
 
@@ -132,7 +135,7 @@ export function buildHealthSummary(groups = [], openTabs = 0) {
     homepageCount: homepageGroup?.tabCount || 0,
     biggestGroup: biggestGroup
       ? {
-          label: biggestGroup.label,
+          label: biggestGroup.displayLabel,
           tabCount: biggestGroup.tabCount,
         }
       : null,
@@ -145,7 +148,7 @@ export function formatCleanupToast({ kind, groupLabel, closedCount }) {
   const tabLabel = `tab${count === 1 ? '' : 's'}`;
 
   if (kind === 'duplicates') {
-    return `Closed ${count} ${duplicateLabel} in ${groupLabel}`;
+    return `Closed ${count} ${duplicateLabel} from ${groupLabel}`;
   }
 
   return `Closed ${count} ${tabLabel} from ${groupLabel}`;

@@ -49,26 +49,39 @@ test('annotateGroupsWithPriority sorts groups by cleanup score and applies stric
     ['github.com', 'docs.example.com', HOMEPAGE_DOMAIN, 'local-files'],
   );
 
-  assert.equal(annotated[0].label, 'GitHub');
+  assert.equal(annotated[0].displayLabel, 'GitHub');
   assert.equal(annotated[0].tabCount, 3);
   assert.equal(annotated[0].duplicateExtraCount, 1);
   assert.equal(annotated[0].cleanupScore, 26);
   assert.deepEqual(annotated[0].priorityReasons, ['1 duplicate tab']);
   assert.equal(annotated[0].priorityTone, 'duplicate');
+  assert.equal(annotated[0].urlCounts['https://github.com/openai/openai'], 2);
 
-  assert.equal(annotated[1].label, 'Docs Example');
+  assert.equal(annotated[1].displayLabel, 'Docs Example');
   assert.equal(annotated[1].cleanupScore, 16);
   assert.deepEqual(annotated[1].priorityReasons, ['Largest group: 8 tabs']);
   assert.equal(annotated[1].priorityTone, 'large');
 
-  assert.equal(annotated[2].label, 'Homepages');
+  assert.equal(annotated[2].displayLabel, 'Homepages');
   assert.equal(annotated[2].cleanupScore, 16);
   assert.deepEqual(annotated[2].priorityReasons, ['Homepage cleanup']);
   assert.equal(annotated[2].priorityTone, 'homepage');
 
-  assert.equal(annotated[3].label, 'Local Files');
+  assert.equal(annotated[3].displayLabel, 'Local Files');
   assert.deepEqual(annotated[3].priorityReasons, ['1 tab open']);
   assert.equal(annotated[3].priorityTone, 'neutral');
+});
+
+test('annotateGroupsWithPriority preserves custom group labels', () => {
+  const annotated = annotateGroupsWithPriority([
+    {
+      domain: 'work-docs',
+      label: 'Client Work',
+      tabs: [{ url: 'https://docs.example.com/spec' }],
+    },
+  ]);
+
+  assert.equal(annotated[0].displayLabel, 'Client Work');
 });
 
 test('buildHealthSummary returns totals and biggest group details', () => {
@@ -111,12 +124,12 @@ test('buildHealthSummary returns totals and biggest group details', () => {
 test('formatCleanupToast returns human-readable duplicate and group cleanup messages', () => {
   assert.equal(
     formatCleanupToast({ kind: 'duplicates', groupLabel: 'GitHub', closedCount: 2 }),
-    'Closed 2 duplicate tabs in GitHub',
+    'Closed 2 duplicate tabs from GitHub',
   );
 
   assert.equal(
     formatCleanupToast({ kind: 'duplicates', groupLabel: 'YouTube', closedCount: 1 }),
-    'Closed 1 duplicate tab in YouTube',
+    'Closed 1 duplicate tab from YouTube',
   );
 
   assert.equal(

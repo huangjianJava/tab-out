@@ -56,6 +56,7 @@
 
     <!-- LEFT COLUMN: Open tabs -->
     <div class="active-section" id="openTabsSection" style="display:none">
+      <div class="tab-health-summary" id="tabHealthSummary" style="display:none"></div>
       <div class="section-header">
         <h2 id="openTabsSectionTitle">Right now</h2>
         <div class="section-line"></div>
@@ -130,6 +131,6 @@
 <script src="config.local.js" onerror="/* no personal config, that's fine */"></script>
 
 <!-- Main dashboard logic — loads last so the DOM is ready -->
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>

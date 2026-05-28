@@ -13,6 +13,12 @@
    5. Stores "Saved for Later" tabs in chrome.storage.local (no server)
    ================================================================ */
 
+import {
+  annotateGroupsWithPriority,
+  buildHealthSummary,
+  formatCleanupToast,
+} from './lib/dashboard-priority.mjs';
+
 'use strict';
 
 
@@ -789,6 +795,66 @@ function buildOverflowChips(hiddenTabs, urlCounts = {}) {
     </div>`;
 }
 
+function renderPriorityBadges(group) {
+  if (!group.priorityReasons || group.priorityReasons.length === 0) return '';
+
+  return `<div class="priority-badges">${
+    group.priorityReasons.map(reason =>
+      `<span class="priority-badge priority-badge-${group.priorityTone || 'neutral'}">${reason}</span>`
+    ).join('')
+  }</div>`;
+}
+
+function renderHealthSummary(summary) {
+  const metrics = [
+    {
+      value: summary.openTabs,
+      label: `Open tab${summary.openTabs === 1 ? '' : 's'}`,
+      accent: false,
+    },
+    {
+      value: summary.duplicateExtras,
+      label: summary.duplicateExtras === 1 ? 'Easy close' : 'Easy closes',
+      accent: summary.duplicateExtras > 0,
+    },
+  ];
+
+  if (summary.biggestGroup) {
+    metrics.push({
+      value: summary.biggestGroup.tabCount,
+      label: summary.biggestGroup.label,
+      accent: false,
+    });
+  }
+
+  if (summary.homepageCount > 0) {
+    metrics.push({
+      value: summary.homepageCount,
+      label: summary.homepageCount === 1 ? 'Homepage' : 'Homepages',
+      accent: false,
+    });
+  }
+
+  const subtitle = summary.duplicateExtras > 0
+    ? `${summary.duplicateExtras} easy close${summary.duplicateExtras === 1 ? '' : 's'} waiting`
+    : 'Everything looks manageable';
+
+  return `
+    <div class="tab-health-copy">
+      <div class="tab-health-title">Tab Health</div>
+      <div class="tab-health-subtitle">${subtitle}</div>
+    </div>
+    <div class="tab-health-metrics">
+      ${metrics.map(metric => `
+        <div class="health-metric${metric.accent ? ' health-metric-accent' : ''}">
+          <span class="health-value">${metric.value}</span>
+          <span class="health-label">${metric.label}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
 
 /* ----------------------------------------------------------------
    DOMAIN CARD RENDERER
@@ -802,16 +868,15 @@ function buildOverflowChips(hiddenTabs, urlCounts = {}) {
  */
 function renderDomainCard(group) {
   const tabs      = group.tabs || [];
-  const tabCount  = tabs.length;
-  const isLanding = group.domain === '__landing-pages__';
+  const tabCount  = group.tabCount || tabs.length;
+  const isLanding = group.isHomepageGroup || group.domain === '__landing-pages__';
   const stableId  = 'domain-' + group.domain.replace(/[^a-z0-9]/g, '-');
 
   // Count duplicates (exact URL match)
-  const urlCounts = {};
-  for (const tab of tabs) urlCounts[tab.url] = (urlCounts[tab.url] || 0) + 1;
+  const urlCounts = group.urlCounts || {};
   const dupeUrls   = Object.entries(urlCounts).filter(([, c]) => c > 1);
-  const hasDupes   = dupeUrls.length > 0;
-  const totalExtras = dupeUrls.reduce((s, [, c]) => s + c - 1, 0);
+  const hasDupes   = (group.duplicateExtraCount || 0) > 0;
+  const totalExtras = group.duplicateExtraCount || dupeUrls.reduce((s, [, c]) => s + c - 1, 0);
 
   const tabBadge = `<span class="open-tabs-badge">
     ${ICONS.tabs}
@@ -878,14 +943,15 @@ function renderDomainCard(group) {
   }
 
   return `
-    <div class="mission-card domain-card ${hasDupes ? 'has-amber-bar' : 'has-neutral-bar'}" data-domain-id="${stableId}">
+    <div class="mission-card domain-card ${group.priorityTone === 'duplicate' ? 'has-amber-bar' : group.priorityTone === 'homepage' ? 'has-active-bar' : group.priorityTone === 'large' ? 'has-slate-bar' : 'has-neutral-bar'}" data-domain-id="${stableId}">
       <div class="status-bar"></div>
       <div class="mission-content">
         <div class="mission-top">
-          <span class="mission-name">${isLanding ? 'Homepages' : (group.label || friendlyDomain(group.domain))}</span>
+          <span class="mission-name">${isLanding ? 'Homepages' : (group.displayLabel || group.label || friendlyDomain(group.domain))}</span>
           ${tabBadge}
           ${dupeBadge}
         </div>
+        ${renderPriorityBadges(group)}
         <div class="mission-pages">${pageChips}</div>
         <div class="actions">${actionsHtml}</div>
       </div>
@@ -1122,38 +1188,30 @@ async function renderStaticDashboard() {
     groupMap['__landing-pages__'] = { domain: '__landing-pages__', tabs: landingTabs };
   }
 
-  // Sort: landing pages first, then domains from landing page sites, then by tab count
-  // Collect exact hostnames and suffix patterns for priority sorting
-  const landingHostnames = new Set(LANDING_PAGE_PATTERNS.map(p => p.hostname).filter(Boolean));
-  const landingSuffixes = LANDING_PAGE_PATTERNS.map(p => p.hostnameEndsWith).filter(Boolean);
-  function isLandingDomain(domain) {
-    if (landingHostnames.has(domain)) return true;
-    return landingSuffixes.some(s => domain.endsWith(s));
-  }
-  domainGroups = Object.values(groupMap).sort((a, b) => {
-    const aIsLanding = a.domain === '__landing-pages__';
-    const bIsLanding = b.domain === '__landing-pages__';
-    if (aIsLanding !== bIsLanding) return aIsLanding ? -1 : 1;
-
-    const aIsPriority = isLandingDomain(a.domain);
-    const bIsPriority = isLandingDomain(b.domain);
-    if (aIsPriority !== bIsPriority) return aIsPriority ? -1 : 1;
-
-    return b.tabs.length - a.tabs.length;
-  });
+  domainGroups = annotateGroupsWithPriority(Object.values(groupMap));
+  const healthSummary = buildHealthSummary(domainGroups, realTabs.length);
 
   // --- Render domain cards ---
   const openTabsSection      = document.getElementById('openTabsSection');
   const openTabsMissionsEl   = document.getElementById('openTabsMissions');
   const openTabsSectionCount = document.getElementById('openTabsSectionCount');
   const openTabsSectionTitle = document.getElementById('openTabsSectionTitle');
+  const healthSummaryEl      = document.getElementById('tabHealthSummary');
 
   if (domainGroups.length > 0 && openTabsSection) {
     if (openTabsSectionTitle) openTabsSectionTitle.textContent = 'Open tabs';
-    openTabsSectionCount.innerHTML = `${domainGroups.length} domain${domainGroups.length !== 1 ? 's' : ''} &nbsp;&middot;&nbsp; <button class="action-btn close-tabs" data-action="close-all-open-tabs" style="font-size:11px;padding:3px 10px;">${ICONS.close} Close all ${realTabs.length} tabs</button>`;
+    openTabsSectionCount.innerHTML = `${domainGroups.length} domain${domainGroups.length !== 1 ? 's' : ''} &nbsp;&middot;&nbsp; <button class="action-btn close-tabs close-tabs-secondary" data-action="close-all-open-tabs">${ICONS.close} Close all ${realTabs.length} tabs</button>`;
+    if (healthSummaryEl) {
+      healthSummaryEl.innerHTML = renderHealthSummary(healthSummary);
+      healthSummaryEl.style.display = 'flex';
+    }
     openTabsMissionsEl.innerHTML = domainGroups.map(g => renderDomainCard(g)).join('');
     openTabsSection.style.display = 'block';
   } else if (openTabsSection) {
+    if (healthSummaryEl) {
+      healthSummaryEl.style.display = 'none';
+      healthSummaryEl.innerHTML = '';
+    }
     openTabsSection.style.display = 'none';
   }
 
@@ -1368,8 +1426,8 @@ document.addEventListener('click', async (e) => {
     const idx = domainGroups.indexOf(group);
     if (idx !== -1) domainGroups.splice(idx, 1);
 
-    const groupLabel = group.domain === '__landing-pages__' ? 'Homepages' : (group.label || friendlyDomain(group.domain));
-    showToast(`Closed ${urls.length} tab${urls.length !== 1 ? 's' : ''} from ${groupLabel}`);
+    const groupLabel = group.displayLabel || group.label || (group.domain === '__landing-pages__' ? 'Homepages' : friendlyDomain(group.domain));
+    showToast(formatCleanupToast({ kind: 'group', groupLabel, closedCount: urls.length }));
 
     const statTabs = document.getElementById('statTabs');
     if (statTabs) statTabs.textContent = openTabs.length;
@@ -1381,6 +1439,9 @@ document.addEventListener('click', async (e) => {
     const urlsEncoded = actionEl.dataset.dupeUrls || '';
     const urls = urlsEncoded.split(',').map(u => decodeURIComponent(u)).filter(Boolean);
     if (urls.length === 0) return;
+    const group = card
+      ? domainGroups.find(g => 'domain-' + g.domain.replace(/[^a-z0-9]/g, '-') === card.dataset.domainId)
+      : null;
 
     await closeDuplicateTabs(urls, true);
     playCloseSound();
@@ -1408,7 +1469,12 @@ document.addEventListener('click', async (e) => {
       card.classList.add('has-neutral-bar');
     }
 
-    showToast('Closed duplicates, kept one copy each');
+    const groupLabel = card?.querySelector('.mission-name')?.textContent || 'this group';
+    showToast(formatCleanupToast({
+      kind: 'duplicates',
+      groupLabel,
+      closedCount: group?.duplicateExtraCount || urls.length,
+    }));
     return;
   }
 
@@ -1428,7 +1494,7 @@ document.addEventListener('click', async (e) => {
       animateCardOut(c);
     });
 
-    showToast('All tabs closed. Fresh start.');
+    showToast('All open web tabs closed');
     return;
   }
 });
