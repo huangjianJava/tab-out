@@ -7,7 +7,7 @@
 
   --ink: #202020;
   --ink-soft: #37352f;
-  --paper: #f7f7f5;
+  --paper: #ffffff;
   --surface: #ffffff;
   --surface-subtle: #fbfbfa;
   --surface-hover: #f1f1ef;
@@ -58,32 +58,39 @@ body::before {
   z-index: 1;
   max-width: 960px;
   margin: 0 auto;
-  padding: 36px 32px 72px;
+  padding: 48px 32px 80px;
 }
 
-/* When the saved-for-later sidebar is open, expand the container
-   so the tab grid still has room for 2-3 columns */
-.container:has(.dashboard-columns) {
-  max-width: 1280px;
-}
 
 /* ---- Header ---- */
 header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 28px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+  padding-bottom: 0;
 }
 
 .header-left h1 {
   font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 0;
+  font-weight: 700;
+  font-size: 40px;
+  letter-spacing: -0.3px;
   color: var(--ink);
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.date-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--muted-soft);
+  flex-shrink: 0;
 }
 
 .header-left .date {
@@ -207,11 +214,20 @@ header {
 
 .section-header h2 {
   font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 500;
+  font-size: 11px;
   font-style: normal;
-  color: var(--ink-soft);
+  color: var(--muted);
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.section-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--muted-soft);
+  flex-shrink: 0;
 }
 
 .section-line {
@@ -293,25 +309,26 @@ header {
 
 /* ---- Mission Cards ---- */
 .missions {
-  columns: 280px;
-  column-gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
   margin-bottom: 40px;
 }
 
 .mission-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(15, 15, 15, 0.08);
   border-radius: 8px;
   padding: 14px 14px 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: 0 1px 4px rgba(15, 15, 15, 0.06);
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  break-inside: avoid;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .mission-card::before {
@@ -326,9 +343,9 @@ header {
 }
 
 .mission-card:hover {
-  background: var(--surface-subtle);
-  border-color: var(--border-strong);
-  box-shadow: 0 6px 18px var(--shadow);
+  background: var(--surface);
+  border-color: rgba(15, 15, 15, 0.14);
+  box-shadow: 0 4px 12px rgba(15, 15, 15, 0.10);
   transform: none;
 }
 
@@ -356,14 +373,6 @@ header {
 /* Hide the right-side meta (page count) — info is already in the badge */
 .mission-meta {
   display: none;
-}
-
-.mission-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
 }
 
 .priority-badges {
@@ -515,13 +524,19 @@ header {
   background: rgba(159, 107, 50, 0.05);
 }
 
-/* Action buttons grouped on the right */
+/* Action buttons grouped on the right — hidden until row is hovered */
 .chip-actions {
   display: flex;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
   margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.page-chip:hover .chip-actions {
+  opacity: 1;
 }
 
 /* ---- Chip action buttons (save + close) ---- */
@@ -535,8 +550,7 @@ header {
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  opacity: 0.32;
-  transition: opacity 0.15s, color 0.15s, background 0.15s;
+  transition: color 0.15s, background 0.15s;
   flex-shrink: 0;
 }
 
@@ -546,7 +560,6 @@ header {
 }
 
 .chip-action:hover {
-  opacity: 1;
   background: var(--surface-hover);
 }
 
@@ -599,12 +612,44 @@ header {
   letter-spacing: 1px;
 }
 
-/* ---- Actions row ---- */
+/* ---- Actions row — always visible (primary action) ---- */
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
+}
+
+/* ---- Card properties row (Notion-style property chips at bottom) ---- */
+.card-properties {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(55, 53, 47, 0.06);
+}
+
+.card-prop {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.card-prop svg {
+  width: 11px;
+  height: 11px;
+}
+
+.card-prop-dupe {
+  color: var(--accent-amber);
+}
+
+.card-properties .priority-badges {
+  display: contents;
 }
 
 .action-btn {
@@ -713,9 +758,8 @@ header {
 
 /* ---- Footer ---- */
 footer {
-  margin-top: 44px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
+  margin-top: 60px;
+  padding-top: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -732,9 +776,9 @@ footer {
 
 .stat-num {
   font-family: var(--font-sans);
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--muted);
   line-height: 1;
   transition: all 0.3s;
 }
@@ -784,13 +828,6 @@ header { animation: fadeUp 0.5s ease both; }
 .abandoned-section .missions .mission-card:nth-child(3) { animation: fadeUp 0.4s ease 0.6s both; }
 footer { animation: fadeUp 0.5s ease 0.65s both; }
 
-.deferred-list .deferred-item:nth-child(1) { animation-delay: 0.05s; }
-.deferred-list .deferred-item:nth-child(2) { animation-delay: 0.1s; }
-.deferred-list .deferred-item:nth-child(3) { animation-delay: 0.15s; }
-.deferred-list .deferred-item:nth-child(4) { animation-delay: 0.2s; }
-.deferred-list .deferred-item:nth-child(5) { animation-delay: 0.25s; }
-.deferred-column .section-header { animation: fadeUp 0.5s ease 0.1s both; }
-
 
 /* ================================================================
    STATIC DEFAULT VIEW — new elements added for "AI on demand"
@@ -814,8 +851,8 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
    ================================================================ */
 
 .missions-empty-state {
-  /* Takes the full width — spans all columns */
-  column-span: all;
+  /* Takes the full width — spans all grid columns */
+  grid-column: 1 / -1;
 
   display: flex;
   flex-direction: column;
@@ -982,45 +1019,8 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
 }
 
 
-/* ================================================================
-   SAVED FOR LATER — Checklist Column + Archive
-   ================================================================ */
-
-/* ---- Two-column layout ---- */
-.dashboard-columns {
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
-}
-
-.dashboard-columns .active-section {
-  flex: 1;
-  min-width: 600px;
-}
-
-.deferred-column {
-  width: 292px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 28px;
-  max-height: calc(100vh - 56px);
-  overflow-y: auto;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-}
-
-/* On narrow screens, stack vertically */
+/* On narrow screens */
 @media (max-width: 800px) {
-  .dashboard-columns {
-    flex-direction: column;
-    gap: 24px;
-  }
-  .dashboard-columns .active-section {
-    min-width: 0;
-    width: 100%;
-  }
   .tab-cleanup-banner,
   .tab-health-summary,
   .update-banner {
@@ -1031,260 +1031,7 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
     width: 100%;
     justify-content: flex-start;
   }
-  .deferred-column {
-    width: 100%;
-    position: static;
-    max-height: none;
-  }
   .actions {
     align-items: stretch;
   }
-}
-
-/* ---- Checklist items ---- */
-.deferred-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px 6px;
-  border-bottom: 1px solid rgba(55, 53, 47, 0.08);
-  border-radius: 5px;
-  animation: fadeUp 0.3s ease both;
-}
-
-.deferred-item:hover {
-  background: var(--surface-hover);
-}
-
-.deferred-item:last-child {
-  border-bottom: none;
-}
-
-/* Custom checkbox */
-.deferred-checkbox {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 17px;
-  height: 17px;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 4px;
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 1px;
-  transition: all 0.15s;
-  position: relative;
-}
-
-.deferred-checkbox:hover {
-  border-color: var(--accent-green);
-}
-
-.deferred-checkbox:checked {
-  background: var(--accent-green);
-  border-color: var(--accent-green);
-}
-
-/* Checkmark inside the checkbox */
-.deferred-checkbox:checked::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 5px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-/* Item content (title, domain, time) */
-.deferred-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.deferred-title {
-  font-size: 13px;
-  color: var(--ink);
-  text-decoration: none;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: color 0.15s;
-}
-
-.deferred-title:hover {
-  color: var(--accent-blue);
-}
-
-.deferred-meta {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 2px;
-  display: flex;
-  gap: 8px;
-}
-
-/* Checked-off item — strikethrough + faded */
-.deferred-item.checked .deferred-title {
-  text-decoration: line-through;
-  color: var(--muted);
-}
-
-.deferred-item.checked .deferred-meta {
-  opacity: 0.5;
-}
-
-/* Dismiss (X) button */
-.deferred-dismiss {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 2px;
-  opacity: 0.3;
-  transition: opacity 0.15s, color 0.15s;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.deferred-dismiss svg {
-  width: 14px;
-  height: 14px;
-}
-
-.deferred-dismiss:hover {
-  opacity: 1;
-  color: var(--status-abandoned);
-}
-
-/* Slide-out animation for items being removed */
-.deferred-item.removing {
-  opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* ---- Empty state ---- */
-.deferred-empty {
-  font-size: 13px;
-  color: var(--muted);
-  font-style: normal;
-  padding: 20px 8px;
-  text-align: center;
-}
-
-/* ---- Archive section ---- */
-.deferred-archive {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-
-.archive-toggle {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 4px;
-  width: 100%;
-  text-align: left;
-  border-radius: 5px;
-  transition: background 0.15s, color 0.15s;
-}
-
-.archive-toggle:hover {
-  background: var(--surface-hover);
-  color: var(--ink);
-}
-
-.archive-chevron {
-  width: 14px;
-  height: 14px;
-  transition: transform 0.2s;
-}
-
-.archive-toggle.open .archive-chevron {
-  transform: rotate(180deg);
-}
-
-.archive-count {
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0.7;
-}
-
-.archive-body {
-  padding-top: 12px;
-}
-
-.archive-search {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  width: 100%;
-  padding: 7px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface-subtle);
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.15s, background 0.15s;
-  margin-bottom: 10px;
-}
-
-.archive-search:focus {
-  background: var(--surface);
-  border-color: var(--accent-blue);
-}
-
-.archive-search::placeholder {
-  color: var(--muted);
-}
-
-/* Archive items are simpler — just title + domain + date */
-.archive-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-  border-bottom: 1px solid rgba(55, 53, 47, 0.06);
-  border-radius: 5px;
-}
-
-.archive-item:hover {
-  background: var(--surface-hover);
-}
-
-.archive-item:last-child {
-  border-bottom: none;
-}
-
-.archive-item-title {
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  min-width: 0;
-  transition: color 0.15s;
-}
-
-.archive-item-title:hover {
-  color: var(--ink);
-}
-
-.archive-item-date {
-  font-size: 10px;
-  color: var(--muted);
-  opacity: 0.6;
-  flex-shrink: 0;
 }

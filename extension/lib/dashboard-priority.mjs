@@ -52,8 +52,6 @@ export function buildPriorityReasons(group = {}, largestTabCount = 0) {
 
   if (tabCount >= 8 && tabCount === largestTabCount) {
     reasons.push(`最大分组：${tabCount} 个标签页`);
-  } else if (reasons.length === 0) {
-    reasons.push(`${tabCount} 个标签页已打开`);
   }
 
   return reasons;
