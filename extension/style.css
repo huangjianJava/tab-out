@@ -1,43 +1,56 @@
 /* ============================================================
-   Tab Mission Control — Dashboard Styles
-   Extracted directly from mockup.html — do not modify unless
-   also updating the mockup. This is the approved design.
+   Tab Out — Notion Database Card Dashboard Styles
    ============================================================ */
 
 :root {
-  --ink: #1a1613;
-  --paper: #f8f5f0;
-  --warm-gray: #e8e2da;
-  --muted: #9a918a;
-  --accent-amber: #c8713a;
-  --accent-sage: #5a7a62;
-  --accent-slate: #5a6b7a;
-  --accent-rose: #b35a5a;
-  --status-active: #3d7a4a;
-  --status-cooling: #b8892e;
-  --status-abandoned: #b35a5a;
-  --card-bg: #fffdf9;
-  --shadow: rgba(26, 22, 19, 0.06);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, "Helvetica Neue", Arial, sans-serif;
+
+  --ink: #202020;
+  --ink-soft: #37352f;
+  --paper: #f7f7f5;
+  --surface: #ffffff;
+  --surface-subtle: #fbfbfa;
+  --surface-hover: #f1f1ef;
+  --border: #e6e6e3;
+  --border-strong: #d8d8d4;
+  --muted: #787774;
+  --muted-soft: #9b9a97;
+
+  --accent-blue: #3f6f9f;
+  --accent-blue-bg: #eef4fb;
+  --accent-green: #4f7d64;
+  --accent-green-bg: #edf6f0;
+  --accent-amber: #9f6b32;
+  --accent-amber-bg: #fbf2e6;
+  --accent-red: #a45151;
+  --accent-red-bg: #f9eeee;
+  --accent-gray-bg: #eeeeec;
+
+  --status-active: var(--accent-green);
+  --status-cooling: var(--accent-amber);
+  --status-abandoned: var(--accent-red);
+  --accent-sage: var(--accent-green);
+  --accent-slate: var(--accent-blue);
+  --accent-rose: var(--accent-red);
+  --warm-gray: var(--border);
+  --card-bg: var(--surface);
+  --shadow: rgba(15, 15, 15, 0.06);
+  --shadow-hover: rgba(15, 15, 15, 0.10);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-sans);
   background: var(--paper);
   color: var(--ink);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Subtle paper texture */
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
+  content: none;
 }
 
 .container {
