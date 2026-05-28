@@ -21,7 +21,7 @@ export function countUrls(tabs = []) {
 export function friendlyGroupLabel(group = {}) {
   const domain = group?.domain || '';
 
-  if (domain === HOMEPAGE_DOMAIN) return 'Homepages';
+  if (domain === HOMEPAGE_DOMAIN) return '主页分组';
   if (group?.label) return group.label;
   if (KNOWN_LABELS[domain]) return KNOWN_LABELS[domain];
 
@@ -43,17 +43,17 @@ export function buildPriorityReasons(group = {}, largestTabCount = 0) {
   const isHomepageGroup = group?.isHomepageGroup || false;
 
   if (duplicateExtraCount > 0) {
-    reasons.push(`${duplicateExtraCount} duplicate tab${duplicateExtraCount === 1 ? '' : 's'}`);
+    reasons.push(`${duplicateExtraCount} 个重复标签页`);
   }
 
   if (isHomepageGroup) {
-    reasons.push('Homepage cleanup');
+    reasons.push('主页清理');
   }
 
   if (tabCount >= 8 && tabCount === largestTabCount) {
-    reasons.push(`Largest group: ${tabCount} tabs`);
+    reasons.push(`最大分组：${tabCount} 个标签页`);
   } else if (reasons.length === 0) {
-    reasons.push(`${tabCount} tab${tabCount === 1 ? '' : 's'} open`);
+    reasons.push(`${tabCount} 个标签页已打开`);
   }
 
   return reasons;
@@ -144,12 +144,12 @@ export function buildHealthSummary(groups = [], openTabs = 0) {
 
 export function formatCleanupToast({ kind, groupLabel, closedCount }) {
   const count = closedCount || 0;
-  const duplicateLabel = `duplicate tab${count === 1 ? '' : 's'}`;
-  const tabLabel = `tab${count === 1 ? '' : 's'}`;
+  const duplicateLabel = `${count} 个重复标签页`;
+  const tabLabel = `${count} 个标签页`;
 
   if (kind === 'duplicates') {
-    return `Closed ${count} ${duplicateLabel} from ${groupLabel}`;
+    return `已从 ${groupLabel} 关闭 ${duplicateLabel}`;
   }
 
-  return `Closed ${count} ${tabLabel} from ${groupLabel}`;
+  return `已从 ${groupLabel} 关闭 ${tabLabel}`;
 }

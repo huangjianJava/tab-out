@@ -53,22 +53,22 @@ test('annotateGroupsWithPriority sorts groups by cleanup score and applies stric
   assert.equal(annotated[0].tabCount, 3);
   assert.equal(annotated[0].duplicateExtraCount, 1);
   assert.equal(annotated[0].cleanupScore, 26);
-  assert.deepEqual(annotated[0].priorityReasons, ['1 duplicate tab']);
+  assert.deepEqual(annotated[0].priorityReasons, ['1 个重复标签页']);
   assert.equal(annotated[0].priorityTone, 'duplicate');
   assert.equal(annotated[0].urlCounts['https://github.com/openai/openai'], 2);
 
   assert.equal(annotated[1].displayLabel, 'Docs Example');
   assert.equal(annotated[1].cleanupScore, 16);
-  assert.deepEqual(annotated[1].priorityReasons, ['Largest group: 8 tabs']);
+  assert.deepEqual(annotated[1].priorityReasons, ['最大分组：8 个标签页']);
   assert.equal(annotated[1].priorityTone, 'large');
 
-  assert.equal(annotated[2].displayLabel, 'Homepages');
+  assert.equal(annotated[2].displayLabel, '主页分组');
   assert.equal(annotated[2].cleanupScore, 16);
-  assert.deepEqual(annotated[2].priorityReasons, ['Homepage cleanup']);
+  assert.deepEqual(annotated[2].priorityReasons, ['主页清理']);
   assert.equal(annotated[2].priorityTone, 'homepage');
 
   assert.equal(annotated[3].displayLabel, 'Local Files');
-  assert.deepEqual(annotated[3].priorityReasons, ['1 tab open']);
+  assert.deepEqual(annotated[3].priorityReasons, ['1 个标签页已打开']);
   assert.equal(annotated[3].priorityTone, 'neutral');
 });
 
@@ -124,21 +124,21 @@ test('buildHealthSummary returns totals and biggest group details', () => {
 test('formatCleanupToast returns human-readable duplicate and group cleanup messages', () => {
   assert.equal(
     formatCleanupToast({ kind: 'duplicates', groupLabel: 'GitHub', closedCount: 2 }),
-    'Closed 2 duplicate tabs from GitHub',
+    '已从 GitHub 关闭 2 个重复标签页',
   );
 
   assert.equal(
     formatCleanupToast({ kind: 'duplicates', groupLabel: 'YouTube', closedCount: 1 }),
-    'Closed 1 duplicate tab from YouTube',
+    '已从 YouTube 关闭 1 个重复标签页',
   );
 
   assert.equal(
-    formatCleanupToast({ kind: 'group', groupLabel: 'Homepages', closedCount: 4 }),
-    'Closed 4 tabs from Homepages',
+    formatCleanupToast({ kind: 'group', groupLabel: '主页分组', closedCount: 4 }),
+    '已从 主页分组 关闭 4 个标签页',
   );
 
   assert.equal(
     formatCleanupToast({ kind: 'group', groupLabel: 'Local Files', closedCount: 1 }),
-    'Closed 1 tab from Local Files',
+    '已从 Local Files 关闭 1 个标签页',
   );
 });

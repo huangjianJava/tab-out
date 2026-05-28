@@ -1,71 +1,71 @@
-# Tab Out First Glance Optimization Design
+# Tab Out 首次一眼体验优化设计
 
-Date: 2026-05-28
-Status: Draft for user review
+日期：2026-05-28  
+状态：待用户审阅
 
-## Goal
+## 目标
 
-Improve Tab Out's first-glance experience for an A+C product direction: faster cleanup plus a more delightful, share-worthy first impression. The next iteration should help users immediately answer:
+为 Tab Out 改进“第一次一眼看上去”的体验，属于 A+C 产品方向：更快完成清理，同时留下更讨喜、更适合分享的第一印象。下一轮迭代应该帮助用户立刻回答以下问题：
 
-- How messy are my tabs right now?
-- Which group should I clean first?
-- Why is this group important?
-- What safe action can I take next?
+- 我现在的标签页到底有多乱？
+- 我应该先清理哪个分组？
+- 为什么这个分组重要？
+- 下一步我可以安全地做什么？
 
-This is a medium-sized product upgrade. It should preserve Tab Out's pure Chrome extension architecture, current interaction model, and local-only privacy promise.
+这是一次中等规模的产品升级。它应该保留 Tab Out 纯 Chrome 扩展的架构、现有交互模型，以及仅本地存储的隐私承诺。
 
-## Chosen Direction
+## 选定方向
 
-Use a hybrid of:
+采用以下两者的混合方案：
 
-- **Priority Grid**: Keep the current domain-card grid, but rank cards by cleanup value instead of raw tab count alone.
-- **Compact Health Header**: Add a restrained summary strip above the grid with actionable signals.
+- **优先级网格**：保留当前按域名分组的卡片网格，但不再只按标签数排序，而是按清理价值排序。
+- **紧凑健康头部**：在网格上方增加一个克制的摘要条，展示可操作信号。
 
-This avoids turning Tab Out into a heavy assistant. It stays lightweight, but the dashboard feels smarter the moment it opens.
+这样可以避免把 Tab Out 变成一个笨重的助手。它仍然轻量，但仪表盘会在打开的一瞬间显得更聪明。
 
-## Non-Goals
+## 非目标
 
-- No backend, accounts, sync, analytics, or external APIs.
-- No onboarding wizard in this iteration.
-- No share card, streaks, or social export yet.
-- No automatic closing. All cleanup actions remain user-triggered.
-- No complex ML-style recommendation engine.
+- 不引入后端、账号、同步、分析或外部 API。
+- 这一轮不做新手引导流程。
+- 不做分享卡片、连续签到或社交导出。
+- 不自动关闭任何内容。所有清理动作都必须由用户触发。
+- 不引入复杂的 ML 风格推荐引擎。
 
-## First-Screen Information Architecture
+## 首屏信息架构
 
-Keep the existing greeting and date header.
+保留现有的问候语和日期标题。
 
-Add a compact **Tab Health** summary above the open-tabs section. It should present three to four actionable metrics:
+在 open-tabs 区域上方增加一个紧凑的 **Tab Health** 摘要。它应该展示三到四个有操作意义的指标：
 
-- **Open tabs**: Count of real web tabs.
-- **Duplicates**: Number of duplicate extras that can be closed while keeping one copy.
-- **Biggest group**: The largest domain group and its tab count.
-- **Homepages**: Count of homepage tabs, shown only when present.
+- **Open tabs**：真实网页标签页的数量。
+- **Duplicates**：可以关闭但保留一份副本的重复项数量。
+- **Biggest group**：最大的域名分组及其标签页数量。
+- **Homepages**：主页标签页数量，仅在存在时显示。
 
-The summary should feel like a calm status strip, not a warning panel. It should use short, positive copy such as "12 easy closes" rather than guilt-heavy language.
+这个摘要应该像一个平静的状态条，而不是一个警告面板。文案应简短而正向，比如“12 easy closes”，而不是带有负面压力的措辞。
 
-The existing card grid remains the main surface. Cards are sorted by cleanup priority, and high-priority cards show small explanation badges such as:
+现有卡片网格仍然是主视图。卡片按清理优先级排序，高优先级卡片会显示小型说明徽标，例如：
 
 - `4 duplicates`
 - `largest group`
 - `homepage cleanup`
 - `12 tabs`
 
-Cards should not show raw numeric scores.
+卡片不应该显示原始数值评分。
 
-## Cleanup Priority Model
+## 清理优先级模型
 
-Each open-tab group gets a `cleanupScore` and a list of human-readable `priorityReasons`.
+每个打开的标签页分组都会得到一个 `cleanupScore` 和一组人类可读的 `priorityReasons`。
 
-Recommended inputs:
+推荐输入信号：
 
-- `duplicateExtraCount`: Highest-value signal. Repeated exact URLs mean the user can safely close extras.
-- `tabCount`: Large groups matter, but this should have lower weight than duplicates.
-- `isHomepageGroup`: Homepages are usually low-risk cleanup targets, so this group receives a fixed boost.
-- `isLocalhost`: Do not penalize or boost localhost groups. Developers may intentionally keep several local project tabs open.
-- `customGroupLabel`: Custom groups should work with the same rules as normal groups, but their label should be preserved in the UI.
+- `duplicateExtraCount`：价值最高的信号。重复的完全相同 URL 意味着用户可以安全地关闭多余副本。
+- `tabCount`：大分组确实重要，但权重应该低于重复项。
+- `isHomepageGroup`：主页通常是低风险清理目标，因此给固定加成。
+- `isLocalhost`：不要对 localhost 分组加重或减重。开发者可能有意保留多个本地项目标签页。
+- `customGroupLabel`：自定义分组应该遵循与普通分组相同的规则，但界面中要保留它们的标签。
 
-Suggested scoring shape:
+建议的评分形状：
 
 ```text
 score =
@@ -74,149 +74,149 @@ score =
   + (isHomepageGroup ? 12 : 0)
 ```
 
-The exact numbers can be tuned during implementation, but the ordering principle should hold:
+具体数值可以在实现过程中微调，但排序原则应保持不变：
 
-1. Groups with duplicates come first.
-2. Homepages come before ordinary groups when cleanup value is similar.
-3. Very large groups come before small groups.
-4. Localhost remains readable but not over-prioritized.
+1. 有重复项的分组排在前面。
+2. 当清理价值相近时，主页分组优先于普通分组。
+3. 非常大的分组优先于较小的分组。
+4. localhost 保持可读，但不要被过度优先。
 
-## Sorting Behavior
+## 排序行为
 
-Current sorting is mostly landing pages first, then priority domains, then tab count. Replace that with cleanup priority while preserving the special Homepages group.
+当前排序大致是先 landing pages，再 priority domains，最后按标签数。现在要改为按清理优先级排序，同时保留特殊的 Homepages 分组。
 
-Recommended order:
+推荐顺序：
 
-1. Homepages, when present and meaningful.
-2. Groups with duplicate extras, sorted by duplicate extras then total tab count.
-3. Large groups, sorted by tab count.
-4. Other groups, sorted by tab count.
+1. Homepages（当它存在且有意义时）。
+2. 有重复项的分组，先按重复项数量，再按总标签数排序。
+3. 大分组，按标签数排序。
+4. 其他分组，按标签数排序。
 
-If the score-based implementation is simpler, use score as the primary sort key and tab count as the secondary key. Ensure Homepages remain easy to find near the top.
+如果用基于分数的实现更简单，就把 score 作为主排序键，再用标签数作为次排序键。确保 Homepages 仍然容易在顶部找到。
 
-## Interaction Design
+## 交互设计
 
-Existing interactions stay intact:
+现有交互保持不变：
 
-- Click a tab chip to focus that tab.
-- Close a single tab from its chip.
-- Save a single tab for later, then close it.
-- Close all tabs in a group.
-- Close duplicate extras while keeping one copy.
-- Use the saved-for-later sidebar and archive.
+- 点击标签 chip 可以聚焦该标签页。
+- 可以从 chip 上关闭单个标签页。
+- 可以先把单个标签页保存为“稍后再看”，再关闭。
+- 可以关闭整个分组中的所有标签页。
+- 可以关闭重复项的多余副本，只保留一份。
+- 可以继续使用已保存标签页侧边栏和归档功能。
 
-New interactions should be minimal:
+新交互应尽量少：
 
-- The Tab Health summary may include one action for duplicate cleanup only if it is scoped and clear.
-- If a summary action is added, it should reuse the existing duplicate-close behavior and copy should state what will be closed.
-- Do not add automatic cleanup or hidden behavior.
+- Tab Health 摘要最多只包含一个动作，而且必须清晰、范围明确，最好是重复清理。
+- 如果添加摘要动作，它应复用现有的关闭重复项逻辑，并且文案必须说明会关闭什么。
+- 不要引入自动清理或隐藏行为。
 
-High-priority visual treatment should guide attention without changing semantics:
+高优先级的视觉处理应该引导注意力，但不能改变语义：
 
-- Stronger top border for high-priority cards.
-- Reason badges in the card header.
-- More obvious duplicate badges.
-- Keep danger actions visually restrained unless the user is hovering or focusing them.
+- 高优先级卡片使用更明显的顶部边框。
+- 在卡片头部显示原因徽标。
+- 让重复徽标更醒目。
+- 保持危险操作视觉上克制，除非用户悬停或聚焦。
 
-## Delight Layer
+## 愉悦层
 
-Delight should reinforce successful cleanup, not distract from scanning.
+愉悦感应该强化成功清理后的反馈，而不是分散扫描注意力。
 
-Keep:
+保留：
 
-- Existing swoosh sound.
-- Existing confetti burst.
-- Existing empty state.
+- 现有 swoosh 音效。
+- 现有 confetti 爆散效果。
+- 现有空状态。
 
-Improve:
+改进：
 
-- Toast messages should include the concrete result when possible, such as "Closed 4 duplicates from YouTube."
-- Empty state can be slightly more specific after cleanup, such as "All open web tabs are cleared."
-- Summary copy should feel friendly and empowering.
+- Toast 文案应该尽可能包含具体结果，例如 “Closed 4 duplicates from YouTube.”
+- 空状态在清理后可以稍微更具体一点，例如 “All open web tabs are cleared.”
+- 摘要文案应该让人感觉友好且有掌控感。
 
-Do not add:
+不要新增：
 
-- Streaks.
-- Share images.
-- Gamified points.
-- Social copy.
+- 连续签到。
+- 分享图片。
+- 游戏化积分。
+- 社交化文案。
 
-These can be considered after the first-glance cleanup loop is working.
+这些内容可以留到第一轮“优先级仪表盘”真正有用之后再考虑。
 
-## Error Handling And Safety
+## 错误处理与安全
 
-The new priority and summary logic must not change tab-closing scope.
+新的优先级和摘要逻辑不能改变关闭标签页的范围。
 
-Preserve existing safety behavior:
+保留现有安全行为：
 
-- Homepages and custom groups close by exact URL.
-- Normal domain groups close by hostname.
-- Duplicate cleanup closes exact URL duplicates while keeping one copy.
-- Tab Out duplicate cleanup keeps the current active Tab Out tab.
+- Homepages 和自定义分组按精确 URL 关闭。
+- 普通域名分组按 hostname 关闭。
+- 重复清理按精确 URL 关闭多余副本，但保留一份。
+- Tab Out 在执行重复清理时会保留当前激活的 Tab Out 标签页。
 
-If a score or summary cannot be computed, the dashboard should fall back to the current card rendering and tab-count sorting.
+如果分数或摘要无法计算，仪表盘应该回退到当前的卡片渲染和按标签数排序。
 
-The global "Close all open tabs" action is high-risk. This iteration should keep its copy explicit and visually secondary. If moved into the health summary, it must remain clearly labeled as all open web tabs.
+全局的 “Close all open tabs” 动作风险很高。这个迭代里，它的文案必须明确，并且视觉上要次要。如果把它放进健康摘要里，也必须清楚地标明是关闭所有打开的网页标签页。
 
-## UI Layout Requirements
+## UI 布局要求
 
-- The health summary must fit above the open-tabs grid on desktop.
-- When the saved-for-later sidebar is visible, the open-tabs grid must still have enough width for card columns.
-- On narrow screens, the health summary should wrap into compact metric rows without overflow.
-- Badges and card titles must not overlap action buttons.
-- Text should use the existing visual language: warm paper background, small badges, restrained amber/sage/rose accents.
+- 健康摘要必须能够在桌面端显示在 open-tabs 网格上方。
+- 当“稍后再看”侧边栏可见时，open-tabs 网格仍然必须保留足够宽度来显示卡片列。
+- 在窄屏下，健康摘要应该折成紧凑的指标行，而不能溢出。
+- 徽标和卡片标题不能和操作按钮重叠。
+- 文本应延续现有视觉语言：温暖的纸张背景、小徽标，以及克制的 amber / sage / rose 点缀。
 
-## Implementation Notes
+## 实现说明
 
-Likely implementation areas:
+可能涉及的实现位置：
 
 - `extension/app.js`
-  - Add derived group metrics.
-  - Add cleanup scoring and priority reasons.
-  - Update group sorting.
-  - Render the Tab Health summary.
-  - Improve toast copy for cleanup results.
+  - 增加派生分组指标。
+  - 增加清理评分和优先级原因。
+  - 更新分组排序。
+  - 渲染 Tab Health 摘要。
+  - 改进清理结果的 toast 文案。
 - `extension/index.html`
-  - Add a summary container above the open-tabs section.
+  - 在顶部区域增加摘要容器。
 - `extension/style.css`
-  - Style the summary strip.
-  - Style priority reason badges and high-priority card states.
-  - Add responsive behavior.
+  - 样式化摘要条。
+  - 样式化优先级原因徽标和高优先级卡片状态。
+  - 增加响应式行为。
 
-No build step or dependency should be introduced.
+不要引入构建步骤或新的依赖。
 
-## Test Plan
+## 测试计划
 
-Manual scenarios:
+手动场景：
 
-1. No duplicates, small number of tabs.
-2. Many duplicate URLs across one domain.
-3. Multiple homepage tabs.
-4. One very large domain group.
-5. Localhost tabs with different ports.
-6. Custom group rules from `config.local.js`.
-7. Saved-for-later sidebar visible.
-8. Narrow viewport.
+1. 没有重复项，标签页数量较少。
+2. 同一域名下存在很多重复 URL。
+3. 多个主页标签页。
+4. 一个非常大的域名分组。
+5. 端口不同的 localhost 标签页。
+6. `config.local.js` 里的自定义分组规则。
+7. “稍后再看”侧边栏可见。
+8. 窄视口。
 
-Verification checks:
+验证检查：
 
-- Health summary counts match visible real web tabs.
-- Duplicate count means extras only, not total duplicate URL instances.
-- Highest-priority cards appear first.
-- Reason badges explain the ordering.
-- Closing a group still closes the same tabs as before.
-- Closing duplicates keeps one copy.
-- Summary and card counts update after close/save actions.
-- No layout overflow on desktop or mobile widths.
+- 健康摘要中的计数必须与可见的真实网页标签页一致。
+- 重复计数指的是多余副本，而不是重复 URL 实例的总数。
+- 最高优先级的卡片排在最前面。
+- 原因徽标应解释排序原因。
+- 关闭分组后仍然会关闭与之前相同的那些标签页。
+- 关闭重复项时会保留一份。
+- 关闭、保存等操作后，摘要和卡片计数都要更新。
+- 在桌面和移动宽度下都不能发生布局溢出。
 
-## Future Follow-Ups
+## 后续优化
 
-Potential later C-direction improvements:
+可以在后续继续考虑的 C 方向改进：
 
-- First-run welcome hint.
-- Cleanup result summary.
-- Before/after snapshot.
-- Optional keyboard shortcuts.
-- A command palette for heavy users.
+- 首次使用欢迎提示。
+- 清理结果摘要。
+- 前后对比快照。
+- 可选键盘快捷键。
+- 面向重度用户的命令面板。
 
-These should wait until the priority dashboard proves useful.
+这些都应该等到优先级仪表盘证明自己确实有用之后再做。
