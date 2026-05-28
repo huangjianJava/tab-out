@@ -352,14 +352,14 @@ function playCloseSound() {
  */
 function shootConfetti(x, y) {
   const colors = [
-    '#c8713a', // amber
-    '#e8a070', // amber light
-    '#5a7a62', // sage
-    '#8aaa92', // sage light
-    '#5a6b7a', // slate
-    '#8a9baa', // slate light
-    '#d4b896', // warm paper
-    '#b35a5a', // rose
+    '#3f6f9f', // soft blue
+    '#dceaf7', // blue tint
+    '#4f7d64', // soft green
+    '#dfeee4', // green tint
+    '#9f6b32', // muted amber
+    '#f3e4cf', // amber tint
+    '#787774', // Notion gray
+    '#e6e6e3', // border gray
   ];
 
   const particleCount = 17;

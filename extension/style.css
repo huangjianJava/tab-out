@@ -420,17 +420,17 @@ header {
 
 .mission-tag.active {
   color: var(--status-active);
-  background: rgba(61, 122, 74, 0.08);
+  background: rgba(79, 125, 100, 0.08);
 }
 
 .mission-tag.cooling {
   color: var(--status-cooling);
-  background: rgba(184, 137, 46, 0.08);
+  background: rgba(159, 107, 50, 0.08);
 }
 
 .mission-tag.abandoned {
   color: var(--status-abandoned);
-  background: rgba(179, 90, 90, 0.08);
+  background: rgba(164, 81, 81, 0.08);
 }
 
 /* Tab indicator badge — shows how many Chrome tabs are still open for this mission */
