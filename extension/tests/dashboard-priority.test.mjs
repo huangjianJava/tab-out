@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
+// Verified initial red run: `node --test extension/tests/dashboard-priority.test.mjs`
+// failed with `ERR_MODULE_NOT_FOUND` before `../lib/dashboard-priority.mjs` existed.
 import {
   HOMEPAGE_DOMAIN,
   annotateGroupsWithPriority,
