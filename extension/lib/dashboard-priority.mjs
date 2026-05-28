@@ -2,9 +2,7 @@ export const HOMEPAGE_DOMAIN = '__landing-pages__';
 
 export const KNOWN_LABELS = {
   'github.com': 'GitHub',
-  'www.github.com': 'GitHub',
   'youtube.com': 'YouTube',
-  'www.youtube.com': 'YouTube',
   'local-files': 'Local Files',
 };
 

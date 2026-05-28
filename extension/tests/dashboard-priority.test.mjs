@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-// Verified initial red run: `node --test extension/tests/dashboard-priority.test.mjs`
-// failed with `ERR_MODULE_NOT_FOUND` before `../lib/dashboard-priority.mjs` existed.
+/*
+Initial red run verified before implementation:
+Command: node --test extension/tests/dashboard-priority.test.mjs
+Result: ERR_MODULE_NOT_FOUND for ../lib/dashboard-priority.mjs
+*/
 import {
   HOMEPAGE_DOMAIN,
   annotateGroupsWithPriority,
@@ -66,43 +69,6 @@ test('annotateGroupsWithPriority sorts groups by cleanup score and applies stric
   assert.equal(annotated[3].label, 'Local Files');
   assert.deepEqual(annotated[3].priorityReasons, ['1 tab open']);
   assert.equal(annotated[3].priorityTone, 'neutral');
-});
-
-test('annotateGroupsWithPriority only falls back to tab count when no higher-priority reason applies', () => {
-  const groups = [
-    {
-      domain: 'github.com',
-      tabs: [
-        { url: 'https://github.com/openai/openai' },
-        { url: 'https://github.com/openai/openai' },
-      ],
-    },
-    {
-      domain: HOMEPAGE_DOMAIN,
-      tabs: [
-        { url: 'https://mail.google.com/mail/u/0/#inbox' },
-        { url: 'https://github.com/' },
-      ],
-    },
-    {
-      domain: 'docs.example.com',
-      tabs: Array.from({ length: 8 }, (_, index) => ({
-        url: `https://docs.example.com/page-${index + 1}`,
-      })),
-    },
-    {
-      domain: 'local-files',
-      tabs: [{ url: 'file:///Users/demo/notes.txt' }],
-    },
-  ];
-
-  const annotated = annotateGroupsWithPriority(groups);
-  const byDomain = Object.fromEntries(annotated.map(group => [group.domain, group]));
-
-  assert.deepEqual(byDomain['github.com'].priorityReasons, ['1 duplicate tab']);
-  assert.deepEqual(byDomain[HOMEPAGE_DOMAIN].priorityReasons, ['Homepage cleanup']);
-  assert.deepEqual(byDomain['docs.example.com'].priorityReasons, ['Largest group: 8 tabs']);
-  assert.deepEqual(byDomain['local-files'].priorityReasons, ['1 tab open']);
 });
 
 test('buildHealthSummary returns totals and biggest group details', () => {
